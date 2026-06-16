@@ -259,7 +259,7 @@ if "download_completo" in st.session_state:
     # Renderiza a tabela dinâmica detalhando por profundidade
     if "df_resumo_fazendas" in st.session_state:
         st.subheader("Resumo de Pontos por Profundidade")
-        st.write("Pontos adicionais em 'Estoque Carbono' se referem aos pontos de Mata")
+        st.caption("Pontos adicionais em 'Estoque Carbono' se referem aos pontos de Mata")
         st.dataframe(
             st.session_state["df_resumo_fazendas"], 
             use_container_width=True, 
