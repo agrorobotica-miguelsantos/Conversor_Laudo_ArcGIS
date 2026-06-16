@@ -258,7 +258,7 @@ if "download_completo" in st.session_state:
     
     # Renderiza a tabela dinâmica detalhando por profundidade
     if "df_resumo_fazendas" in st.session_state:
-        st.subheader("Resumo de Pontos por Profundidade")
+        st.subheader("2. Resumo de Pontos por Profundidade")
         st.markdown("Obs: pontos adicionais em 'Estoque Carbono' se referem aos pontos de Mata")
         st.dataframe(
             st.session_state["df_resumo_fazendas"], 
@@ -266,6 +266,8 @@ if "download_completo" in st.session_state:
             hide_index=True
         )
         st.write("")
+    
+    st.divider()
 
     st.subheader("3. Baixar Resultados")
     
