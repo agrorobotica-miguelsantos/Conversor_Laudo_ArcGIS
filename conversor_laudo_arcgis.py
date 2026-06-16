@@ -35,7 +35,7 @@ with col1:
 
 with col2:
     st.success("Laudo de Sustentabilidade")
-    file_sust = st.file_uploader("Escolha o arquivo de Sustentabilidade", type=["xlsx"], key="sust")
+    file_sust = st.file_uploader("Escolha o arquivo de Sustentabilidade Completo", type=["xlsx"], key="sust")
 
 # Função auxiliar para padronizar nomes de fazendas e evitar quebras de cruzamento
 def normalizar_nome_fazenda(nome):
