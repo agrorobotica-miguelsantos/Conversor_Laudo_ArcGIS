@@ -73,7 +73,7 @@ if file_fert and file_sust:
         
     st.warning(f"Código da OS identificado a partir do arquivo: **{cod_os}**")
 
-    if st.button("Processar Planilhas", use_container_width=True):
+    if st.button("Processar planilhas", use_container_width=True):
         with st.spinner("Analisando profundidades e gerando estrutura dinâmica... Por favor, aguarde."):
             try:
                 # 1. Leitura dos dados brutos
