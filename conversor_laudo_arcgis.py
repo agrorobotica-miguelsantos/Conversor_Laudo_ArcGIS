@@ -73,7 +73,7 @@ if file_fert and file_sust:
         
     st.warning(f"Código da OS identificado a partir do arquivo: **{cod_os}**")
 
-    if st.button("Processar e Criar Abas Dinâmicas", use_container_width=True):
+    if st.button("Processar Planilhas", use_container_width=True):
         with st.spinner("Analisando profundidades e gerando estrutura dinâmica... Por favor, aguarde."):
             try:
                 # 1. Leitura dos dados brutos
@@ -260,7 +260,7 @@ if "download_completo" in st.session_state:
         st.dataframe(
             st.session_state["df_resumo_fazendas"], 
             use_container_width=True, 
-            index=False
+            hide_index=True
         )
         st.write("")
 
