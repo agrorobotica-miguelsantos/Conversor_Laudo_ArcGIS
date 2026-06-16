@@ -4,7 +4,7 @@ import io
 import zipfile
 
 # Configuração da página do Streamlit
-st.set_page_config(page_title="Conversor de Laudos ArcGIS Dinâmico", layout="centered")
+st.set_page_config(page_title="Conversor de Laudos ArcGIS", layout="centered")
 
 st.html(
     """
@@ -73,7 +73,7 @@ if file_fert and file_sust:
         
     st.warning(f"Código da OS identificado a partir do arquivo: **{cod_os}**")
 
-    if st.button("Processar e Criar Abas Dinâmicas", use_container_width=True):
+    if st.button("Processar Planilhas", use_container_width=True):
         with st.spinner("Analisando profundidades e gerando estrutura dinâmica... Por favor, aguarde."):
             try:
                 # 1. Leitura dos dados brutos
@@ -258,7 +258,7 @@ if "download_completo" in st.session_state:
     
     # Renderiza a tabela dinâmica detalhando por profundidade
     if "df_resumo_fazendas" in st.session_state:
-        st.subheader("📊 Resumo de Pontos por Profundidade")
+        st.subheader("Resumo de Pontos por Profundidade")
         st.dataframe(
             st.session_state["df_resumo_fazendas"], 
             use_container_width=True, 
