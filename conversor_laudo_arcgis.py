@@ -73,7 +73,7 @@ if file_fert and file_sust:
         
     st.warning(f"Código da OS identificado a partir do arquivo: **{cod_os}**")
 
-    if st.button("Processar planilhas", use_container_width=True):
+    if st.button("Processar e Criar Abas Dinâmicas", use_container_width=True):
         with st.spinner("Analisando profundidades e gerando estrutura dinâmica... Por favor, aguarde."):
             try:
                 # 1. Leitura dos dados brutos
@@ -180,7 +180,7 @@ if file_fert and file_sust:
                 st.info("Iniciando a divisão por propriedades...")
                 buffer_zip = io.BytesIO()
                 
-                # Lista para registrar o resumo de contagem de linhas por fazenda
+                # Lista para registrar o resumo detalhado por profundidade
                 dados_resumo = []
 
                 with zipfile.ZipFile(buffer_zip, "w", zipfile.ZIP_DEFLATED) as arquivo_zip:
@@ -190,8 +190,8 @@ if file_fert and file_sust:
                         nome_prop_limpo = nome_real.replace(' ', '_').replace('/', '_')
                         nome_excel_prop = f"OS_{cod_os}_ArcGIS_{nome_prop_limpo}.xlsx"
                         
-                        # Armazena a contagem total de linhas processadas dessa fazenda nas abas de análise
-                        linhas_fazenda_prof = 0
+                        # Dicionário base do registro desta fazenda na tabela de resumo
+                        registro_fazenda = {"Propriedade": nome_real}
                         
                         buffer_prop = io.BytesIO()
                         with pd.ExcelWriter(buffer_prop, engine='openpyxl') as writer_prop:
@@ -199,8 +199,11 @@ if file_fert and file_sust:
                             # 1. Filtra as abas de profundidade dinâmicas para esta fazenda específica
                             for prof in profundidades_encontradas:
                                 df_prof = merge[(merge['PROFUNDIDADE'] == prof) & (merge['FAZENDA_NORM'] == prop_norm)].copy()
+                                
+                                # Guarda a quantidade exata de pontos para esta profundidade específica
+                                registro_fazenda[f"Amostras ({prof})"] = len(df_prof)
+                                
                                 if not df_prof.empty:
-                                    linhas_fazenda_prof += len(df_prof) # Acumula a quantidade de linhas
                                     partes_prof = prof.split('-')
                                     df_prof['Prof_inferior'] = partes_prof[0] if len(partes_prof) > 0 else ""
                                     df_prof['Prof_superior'] = partes_prof[1] if len(partes_prof) > 1 else ""
@@ -213,9 +216,12 @@ if file_fert and file_sust:
                                     df = df[COLUNAS_PROF_PADRAO].copy()
                                     df.to_excel(writer_prop, sheet_name=prof, startrow=0, index=False, header=True)
                             
-                            # 2. Filtra a aba de estoque de carbono para esta fazenda específica de forma correta
+                            # 2. Filtra a aba de estoque de carbono para esta fazenda específica
                             df_est_prop = estoque_base[estoque_base['FAZENDA_NORM'] == prop_norm].copy()
-                            linhas_estoque = len(df_est_prop)
+                            
+                            # Guarda a quantidade de pontos do estoque de carbono
+                            registro_fazenda["Estoque Carbono"] = len(df_est_prop)
+                            
                             if not df_est_prop.empty:
                                 df_est_prop = df_est_prop.rename(columns=mapeamento_estoque)
                                 for col in COLUNAS_ESTOQUE_PADRAO:
@@ -224,12 +230,8 @@ if file_fert and file_sust:
                                 df_est_prop = df_est_prop[COLUNAS_ESTOQUE_PADRAO].copy()
                                 df_est_prop.to_excel(writer_prop, sheet_name='estoque_carbono', startrow=0, index=False, header=True)
                         
-                        # Adiciona as métricas coletadas dessa fazenda na lista de resumo
-                        dados_resumo.append({
-                            "Propriedade": nome_real,
-                            "Linhas de Amostras (Profundidades)": linhas_fazenda_prof,
-                            "Linhas de Estoque de Carbono": linhas_estoque
-                        })
+                        # Adiciona o registro estruturado da fazenda na lista
+                        dados_resumo.append(registro_fazenda)
                         
                         buffer_prop.seek(0)
                         arquivo_zip.writestr(nome_excel_prop, buffer_prop.read())
@@ -242,7 +244,7 @@ if file_fert and file_sust:
                 st.session_state["nome_completo"] = f"OS_{cod_os}_ArcGIS_Completo.xlsx"
                 st.session_state["nome_zip"] = f"OS_{cod_os}_ArcGIS_Separado.zip"
                 
-                # Salva a tabela contendo o resumo para ser renderizada abaixo
+                # Salva o DataFrame final de resumo estruturado na sessão
                 st.session_state["df_resumo_fazendas"] = pd.DataFrame(dados_resumo)
                 
                 st.success("Processamento dinâmico concluído com sucesso!")
@@ -254,9 +256,9 @@ if file_fert and file_sust:
 if "download_completo" in st.session_state:
     st.write("---")
     
-    # Renderiza a tabela com o resumo estruturado de fazendas e quantidade de linhas
+    # Renderiza a tabela dinâmica detalhando por profundidade
     if "df_resumo_fazendas" in st.session_state:
-        st.subheader("📊 Resumo das Propriedades Processadas")
+        st.subheader("📊 Resumo de Pontos por Profundidade")
         st.dataframe(
             st.session_state["df_resumo_fazendas"], 
             use_container_width=True, 
